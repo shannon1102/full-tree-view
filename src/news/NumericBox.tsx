@@ -7,31 +7,40 @@ type State = {
 }
 
 export default class NumericBox extends Component<IData, State> {
-    // state = {
-    //     value: this.props.value
-    // }
-    increment(callback: any): void {
+    state = {
+        value: 0
+    }
+    
+    componentWillReceiveProps = (nextProps:IData) => {
+        console.log(nextProps);
+        if (nextProps.value !== this.props.value) {
+        //   this.moveMap(nextProps.position)
+      
+        }
+        return null
+      }
+    decrement(callback: any): void {
         // this.setState((state) => ({
         //     value: callback(state.value)
         // }))
-
-        
-
-    }
-    decrement(callback: any): void {
-        this.setState((state) => ({
-            value: callback(state.value)
-        }))
     }
     drawPlusButton() {
-        return <button style={{ backgroundColor: this.props.style?.backgroundColor }} className='nice-numeric__btn' onClick={() => this.decrement(this.props.plusOnlick)}>+</button>
+        return <button style={{ backgroundColor: this.props.style?.backgroundColor }} className='nice-numeric__btn' onClick={() => {
+            debugger
+            console.log("???")
+            this.props.plusOnlick && this.props.plusOnlick(this.state.value);
+            //this.componentWillReceiveProps(this.props)
+            // this.forceUpdate()
+            // React.useEffect(() => { console.log("component updated"); });
+
+        }}>+</button>
     }
     drawMinusButton() {
         return <button style={{ backgroundColor: this.props.style?.backgroundColor }} className='nice-numeric__btn' onClick={() => this.decrement(this.props.minusOnclick)}>-</button>
     }
 
     drawValueBox() {
-        return <input style={{ width: '4ch', textAlign: 'left'}} value={this.state.value} onChange={() => { }} className='nice-numeric__value'></input>
+        return <input style={{ width: '4ch', textAlign: 'left'}} value={this.props.value} onChange={() => { }} className='nice-numeric__value'></input>
     }
 
     render() {
@@ -68,8 +77,7 @@ export default class NumericBox extends Component<IData, State> {
                 <div className="nice-numeric">
                   
                         {this.drawValueBox()}
-                    <div className='right-side-by-side__value'>
-                    </div>
+                  
                     <div className="right-side-by-side__column">
                         {this.drawPlusButton()}
                         {this.drawMinusButton()}

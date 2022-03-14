@@ -16,8 +16,8 @@ export interface IGeneralInputProperties<TValue> {
 }
 
 export interface INumericBoxBehavior {
-    plusOnlick?: (v: number) => number;
-    minusOnclick?: (v: number) => number;
+    plusOnlick?: (v: number) => void;
+    minusOnclick?: (v: number) => void;
 }
 
 export interface INumericBoxStyles {

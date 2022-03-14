@@ -30,8 +30,19 @@ function App() {
 
   return (
     <div className='demo'>
-      <NumericBox displayType={DisplayType.RightSide} value={ 10 } plusOnlick={(a)=> dto.value1 = a+1} minusOnclick={(a: number)=> -1}></NumericBox>
-      <NumericBox displayType={DisplayType.SideBySide}  value={ dto.value2 } style={defaultIStyle} plusOnlick={(a)=> dto.value2 = a+2} minusOnclick={(a)=>a-1}></NumericBox>
+      <NumericBox displayType={DisplayType.RightSide} value={ dto.value1 } plusOnlick={(a)=> {
+
+
+          dto.value1 = a+1;
+
+      }} minusOnclick={(a: number)=> -1}></NumericBox>
+      <NumericBox displayType={DisplayType.SideBySide}  value={ dto.value2 } style={defaultIStyle} plusOnlick={(a)=> {
+
+        debugger;
+
+        dto.value2 = a+2;
+
+      }} minusOnclick={(a)=>a-1}></NumericBox>
       <NumericBox displayType={DisplayType.RightSideBySide}  value={ dto.value3 } style={defaultIStyle} plusOnlick={(a)=> dto.value3 = a+2 } minusOnclick={(a)=>a-1}></NumericBox>
 
     </div>

@@ -2,41 +2,41 @@ import React, { Component } from 'react'
 import { DisplayType, IData } from './interface'
 
 
-type State = {
-    value: number
-}
+// type State = {
+//     value: number
+// }
 
-export default class NumericBox extends Component<IData, State> {
-    state = {
-        value: 0
-    }
+export default class NumericBox extends Component<IData> {
+    // state = {
+    //     value: this.props.value
+    // }
     
+    // setState(this.state.value)
+    // shouldComponentUpdate(nextProps:IData){
+    //     console.log("ALoooo");
+    //     console.log(nextProps);
+    //     return nextProps.value !== this.props.value;
+    // }
     componentWillReceiveProps = (nextProps:IData) => {
-        console.log(nextProps);
-        if (nextProps.value !== this.props.value) {
+        console.log('aloooo',nextProps);
+        // this.state.value = nextProps.value;
+        return (nextProps.value !== this.props.value) 
         //   this.moveMap(nextProps.position)
-      
-        }
-        return null
       }
-    decrement(callback: any): void {
-        // this.setState((state) => ({
-        //     value: callback(state.value)
-        // }))
-    }
+
     drawPlusButton() {
         return <button style={{ backgroundColor: this.props.style?.backgroundColor }} className='nice-numeric__btn' onClick={() => {
-            debugger
+            // debugger
             console.log("???")
-            this.props.plusOnlick && this.props.plusOnlick(this.state.value);
+            this.props.plusOnlick && this.props.plusOnlick(this.props.value);
             //this.componentWillReceiveProps(this.props)
             // this.forceUpdate()
             // React.useEffect(() => { console.log("component updated"); });
-
+            console.log(this.props)
         }}>+</button>
     }
     drawMinusButton() {
-        return <button style={{ backgroundColor: this.props.style?.backgroundColor }} className='nice-numeric__btn' onClick={() => this.decrement(this.props.minusOnclick)}>-</button>
+        return <button style={{ backgroundColor: this.props.style?.backgroundColor }} className='nice-numeric__btn' onClick={() => (this.props.minusOnclick)}>-</button>
     }
 
     drawValueBox() {

@@ -30,15 +30,11 @@ function App() {
 
   return (
     <div className='demo'>
-      <NumericBox displayType={DisplayType.RightSide} value={ dto.value1 } plusOnlick={(a)=> {
-
-
-          dto.value1 = a+1;
-
-      }} minusOnclick={(a: number)=> -1}></NumericBox>
+      <NumericBox displayType={DisplayType.RightSide} value={ dto.value1 } plusOnlick={(a)=> { dto.value1 = a+1;}} 
+          minusOnclick={(a: number)=> -1}></NumericBox>
       <NumericBox displayType={DisplayType.SideBySide}  value={ dto.value2 } style={defaultIStyle} plusOnlick={(a)=> {
 
-        debugger;
+        // debugger
 
         dto.value2 = a+2;
 

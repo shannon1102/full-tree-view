@@ -53,21 +53,3 @@ class ChildNumeric extends NumericStrategy {
   
 } 
 
-  // if (this.props.type == TypeOfNumeric.UD) {
-    //   return (
-    //     <div>
-    //       <UDNumeric {...this.props} />
-    //     </div>
-    //   )
-    // } else if (this.props.type == TypeOfNumeric.SBS) {
-    //   return (
-    //     <div>
-    //       <SBSNumeric {...this.props} />
-    //     </div>
-    //   )
-    // }
-    // else {
-    //   return (<div>
-    //     <LRNumeric {...this.props} />
-    //   </div>)
-    // }

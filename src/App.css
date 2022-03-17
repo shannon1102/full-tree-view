@@ -7,7 +7,7 @@
   display: flex;
   max-width: 300px;
   margin-top: 10px;
-  border: 0.5px solid;
+  /* border: 0.5px solid; */
   border-color: rgb(160,160,255);
   border-radius: 2px;
 }
@@ -31,16 +31,22 @@ input{
 }
 
 .nice-numeric--right-side-by-side {
+  outline: none;
   display: flex;
   flex: 1;
   flex-direction: column;
 } 
 .right-side-by-side__value {
   flex: 3;
+  outline: none;
 }
 .right-side-by-side__column {
   display: flex;
   flex-direction: column;
+  outline: none;
   flex: 1;
 }
 
+button {
+  outline: none;
+}

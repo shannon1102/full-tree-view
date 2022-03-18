@@ -14,22 +14,24 @@ export class CatsService {
   ) { }
 
   async create(createCatDto: CreateCatDto): Promise<Number> {
-    console.log("CatService create()");
+    // console.log("CatService create()");
     var session = await this.connection.startSession();
-    console.log("CatService create() initialized session");
+    // console.log("CatService create() initialized session");
     var catCountBefore = await this.catModel.countDocuments();
-    console.log("CatService create() got countBefore");
+    // console.log("CatService create() got countBefore");
 
     try {
       await session.startTransaction();
       // const createdCat = await this.catModel.create(createCatDto);
       // const createdCatSecond = await this.catModel.create(createCatDto);
-      const createdCat = await this.catModel.create([{ createCatDto }], { session: session });
+      console.log("cats.service - create() - createCatDto: ", createCatDto);
+
+      const createdCat = await this.catModel.create([ createCatDto ], { session: session });
       // const createdCatSecond = await this.catModel.create([{ createCatDto }], { session: session });
       await session.commitTransaction();
     } catch (error) {
       // console.error("Vao phan error roi");
-      console.error("CatService create()", error);
+      console.error("CatService create() catch", error);
       await session.abortTransaction();
     }
     finally {
@@ -61,7 +63,7 @@ export class CatsService {
     //   .findByIdAndRemove({ _id: id })
     //   .exec();
 
-    const deletedCat = await this.catModel.deleteMany({ age: { $gte: 2 } });
+    const deletedCat = await this.catModel.deleteMany({ $or: [{ age: { $gte: 2 } }, { age: null }] });
     return deletedCat;
   }
 }

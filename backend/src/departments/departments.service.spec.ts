@@ -51,7 +51,8 @@ describe('DepartmentsService', () => {
     var mockDepartment = {
       name: "department 7",
       code: "7",
-      parentCode: "1"
+      parentCode: "1",
+      rootParentCode: null,
     };
     const createResult = await service.create(mockDepartment);
     expect(createResult).toEqual(createResult);

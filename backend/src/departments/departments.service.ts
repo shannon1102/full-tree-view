@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -20,15 +20,40 @@ export class DepartmentsService {
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
     var session = await this.connection.startSession();
+    
+    //gán lại rootParentCode = null đề phòng front-end truyền sai dữ liệu
+    createDepartmentDto.rootParentCode = null;
+
+    //#region Validate logic 
+    //Nếu có giá trị parentCode thì 
+    if (createDepartmentDto.parentCode) {
+      var parentDepartment = await this.departmentModel.findOne({ code: createDepartmentDto.parentCode }).exec();
+
+      if (parentDepartment == null) {
+        throw new HttpException({
+          status: HttpStatus.BAD_REQUEST,
+          error: "parentCode not exist: " + createDepartmentDto.parentCode,
+        }, HttpStatus.BAD_REQUEST);
+      }
+
+      createDepartmentDto.rootParentCode = parentDepartment.rootParentCode ?? parentDepartment.code;
+    }
+    //#endregion
+
 
     try {
       await session.startTransaction()
-      const createdDepartment = await this.departmentModel.create(createDepartmentDto);
+      const createdDepartment = await this.departmentModel.create([createDepartmentDto], { session: session });
       await session.commitTransaction();
-      return createdDepartment;
+      return createdDepartment[0];
     } catch (error) {
       await session.abortTransaction();
-      throw new Error(error);
+      // throw new Error(error);
+      console.error(error);
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: error,
+      }, HttpStatus.BAD_REQUEST);
     }
     finally {
       session.endSession()
@@ -51,13 +76,38 @@ export class DepartmentsService {
     return result;
   }
 
+  async findOne(id: string): Promise<DepartmentResponseDto> {
+    console.log("department.service: findOne(), id = ", id);
+
+    let relevantDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: id }, { code: id }] }).exec();
+    let rootNode = relevantDepartments.find(x => x.code == id);
+    // let childrenDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: rootNode.code }, { code: id }] }).exec();
+
+    console.log("rootNode = ", rootNode);
+
+    // return null;
+    if (rootNode == null) {
+      return null
+    }
+
+    return this.constructDepartmentTree(rootNode, relevantDepartments);
+  }
+
+  update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
+    return `This action updates a #${id} department`;
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} department`;
+  }
+
   /**
    * Dựng lên department tree của department gốc
    * @param rootDepartment Deparment gốc
    * @param relevantDepartments Các department mà có liên quan đến department này
    * @returns Department gốc sau khi đã append children của nó
    */
-  constructDepartmentTree(rootDepartment: DeparmentDocument, relevantDepartments: DeparmentDocument[]): DepartmentResponseDto {
+  private constructDepartmentTree(rootDepartment: DeparmentDocument, relevantDepartments: DeparmentDocument[]): DepartmentResponseDto {
     // return null;
     if (rootDepartment == null) {
       return null
@@ -94,25 +144,8 @@ export class DepartmentsService {
     return mappedNode;
   }
 
-  async findOne(id: string): Promise<DepartmentResponseDto> {
-    console.log("department.service: findOne(), id = ", id);
 
-    let relevantDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: id }, { code: id }] }).exec();
-    let rootNode = relevantDepartments.find(x => x.code == id);
-    // let childrenDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: rootNode.code }, { code: id }] }).exec();
-
-    console.log("rootNode = ", rootNode);
-
-    // return null;
-    if (rootNode == null) {
-      return null
-    }
-
-    return this.constructDepartmentTree(rootNode, relevantDepartments);
-  }
-
-
-  mapNodeToAutoMapper(defaultNode: Department): DepartmentResponseDto {
+  private mapNodeToAutoMapper(defaultNode: Department): DepartmentResponseDto {
     var mappedNode = new DepartmentResponseDto();
     mappedNode.name = defaultNode.name;
     mappedNode.code = defaultNode.code;
@@ -121,13 +154,5 @@ export class DepartmentsService {
     mappedNode.childDepartments = new Array<DepartmentResponseDto>();
 
     return mappedNode;
-  }
-
-  update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
-    return `This action updates a #${id} department`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} department`;
   }
 }

@@ -9,7 +9,7 @@ export class CatsController {
 
   @Post()
   async create(@Body(new ValidationPipe({ transform: true })) createCatDto: CreateCatDto): Promise<Number> {
-    console.log("cats.controller - create() - dto: ", createCatDto);
+    // console.log("cats.controller - create() - dto: ", createCatDto);
 
     return await this.catsService.create(createCatDto);
   }

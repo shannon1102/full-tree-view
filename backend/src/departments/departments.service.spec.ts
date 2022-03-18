@@ -24,6 +24,7 @@ describe('DepartmentsService', () => {
             new: jest.fn().mockResolvedValue(mockDepartment),
             constructor: jest.fn().mockResolvedValue(mockDepartment),
             find: jest.fn(),
+            findOne: jest.fn(),
             create: jest.fn(),
             exec: jest.fn(),
           },
@@ -48,6 +49,17 @@ describe('DepartmentsService', () => {
   });
 
   it('should insert a new department', async () => {
+
+    jest.spyOn(model, 'findOne').mockReturnValueOnce({
+      exec: jest.fn().mockResolvedValueOnce([{
+        rootParentCode: "F",
+        parentCode: "F",
+        code: "10",
+        name: "department 10",
+        // "_id": "62345687a30adfcecaa3f4fd",
+        // "__v": 0
+      }])
+    } as any)
     var mockDepartment = {
       name: "department 7",
       code: "7",

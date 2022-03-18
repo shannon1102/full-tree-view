@@ -19,6 +19,8 @@ export class DepartmentsService {
   // }
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
+    console.log("before create session");
+    
     var session = await this.connection.startSession();
     
     //gán lại rootParentCode = null đề phòng front-end truyền sai dữ liệu
@@ -27,7 +29,10 @@ export class DepartmentsService {
     //#region Validate logic 
     //Nếu có giá trị parentCode thì 
     if (createDepartmentDto.parentCode) {
+      console.log("before findOne()");
+      
       var parentDepartment = await this.departmentModel.findOne({ code: createDepartmentDto.parentCode }).exec();
+      console.log("after findOne()");
 
       if (parentDepartment == null) {
         throw new HttpException({

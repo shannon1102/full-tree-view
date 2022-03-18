@@ -14,6 +14,9 @@ export class Department {
 
     @Prop()
     parentCode: string;
+
+    @Prop()
+    rootParentCode: string;
 }
 
 export const DepartmentSchema = SchemaFactory.createForClass(Department);

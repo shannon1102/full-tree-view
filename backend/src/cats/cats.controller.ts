@@ -8,7 +8,7 @@ export class CatsController {
   constructor(private readonly catsService: CatsService) { }
 
   @Post()
-  async create(@Body() createCatDto: CreateCatDto): Promise<Cat> {
+  async create(@Body() createCatDto: CreateCatDto): Promise<Number> {
     return await this.catsService.create(createCatDto);
   }
 
@@ -24,10 +24,13 @@ export class CatsController {
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
+    console.log("Delete 1 cat");
+    
     return this.catsService.delete(id);
   }
-  @Delete('all')
+  @Delete()
   async deleteAll() {
+    console.log("Delete all cats");
     return this.catsService.deleteAll();
   }
 }

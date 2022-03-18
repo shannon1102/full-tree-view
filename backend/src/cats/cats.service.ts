@@ -4,6 +4,7 @@ import { Model, Mongoose } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { Cat, CatDocument } from './schemas/cat.schema';
+import { assert } from 'console';
 
 @Injectable()
 export class CatsService {
@@ -12,30 +13,32 @@ export class CatsService {
     @InjectConnection() private readonly connection: mongoose.Connection
   ) { }
 
-  async create(createCatDto: CreateCatDto): Promise<Cat> {
-    var session = await this.catModel.startSession();
-    session.startTransaction();
-    const createdCat = await this.catModel.create(createCatDto);
-    // await transactionSession.abortTransaction();
-    
-    var count = await this.catModel.countDocuments();
-    session.commitTransaction();
-    // const transactionSession = await this.connection.startSession();
-    // transactionSession.startTransaction();
+  async create(createCatDto: CreateCatDto): Promise<Number> {
+    console.log("CatService create()");
+    var session = await this.connection.startSession();
+    console.log("CatService create() initialized session");
+    var catCountBefore = await this.catModel.countDocuments();
+    console.log("CatService create() got countBefore");
 
-    // const createdCat = await this.catModel.create(createCatDto);
-    // // await transactionSession.abortTransaction();
+    try {
+      await session.startTransaction();
+      // const createdCat = await this.catModel.create(createCatDto);
+      // const createdCatSecond = await this.catModel.create(createCatDto);
+      const createdCat = await this.catModel.create([{ createCatDto }], { session: session });
+      // const createdCatSecond = await this.catModel.create([{ createCatDto }], { session: session });
+      await session.commitTransaction();
+    } catch (error) {
+      // console.error("Vao phan error roi");
+      console.error("CatService create()", error);
+      await session.abortTransaction();
+    }
+    finally {
+      session.endSession();
+    }
 
-    // transactionSession.endSession();
+    var catCountAfter = await this.catModel.countDocuments();
 
-    console.log("count = ", count);
-
-    return createdCat;
-    // transactionSession.withTransaction(() => {
-
-    // })
-    // const createdCat = await this.catModel.create(createCatDto);
-    // return createdCat;
+    return catCountAfter - catCountBefore;
   }
 
   async findAll(): Promise<Cat[]> {
@@ -58,7 +61,7 @@ export class CatsService {
     //   .findByIdAndRemove({ _id: id })
     //   .exec();
 
-    const deletedCat = await this.catModel.deleteMany().exec();
+    const deletedCat = await this.catModel.deleteMany({ age: { $gte: 2 } });
     return deletedCat;
   }
 }

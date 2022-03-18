@@ -57,7 +57,7 @@ describe('Cats Controller', () => {
     it('should create a new cat', async () => {
       const createSpy = jest
         .spyOn(service, 'create')
-        .mockResolvedValueOnce(mockCat);
+        .mockResolvedValueOnce(1);
 
       await controller.create(createCatDto);
       expect(createSpy).toHaveBeenCalledWith(createCatDto);

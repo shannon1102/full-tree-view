@@ -97,7 +97,9 @@ export class DepartmentsService {
   async findOne(id: string): Promise<DepartmentResponseDto> {
     console.log("department.service: findOne(), id = ", id);
 
-    let rootNode = await this.departmentModel.findOne({ code: id }).exec();
+    let relevantDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: id }, { code: id }] }).exec();
+    let rootNode = relevantDepartments.find(x => x.code == id);
+    // let childrenDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: rootNode.code }, { code: id }] }).exec();
 
     console.log("rootNode = ", rootNode);
 
@@ -106,40 +108,7 @@ export class DepartmentsService {
       return null
     }
 
-    //lấy ra danh sách các department children của rootNode
-    let childrenDepartments = await this.departmentModel.find({ rootParentCode: rootNode.code }).exec();
-
-    return this.constructDepartmentTree(rootNode, childrenDepartments);
-
-    // //Chuyển từ node lấy từ db sang node dto
-    // var mappedNode = this.mapNodeToAutoMapper(rootNode);
-    // console.log("mappedNode = ", mappedNode);
-
-    // //Tạo queue lưu lại các node chưa được lấy child nodes
-    // let nodeQueue = new Queue<DepartmentResponseDto>(mappedNode);
-
-    // while (nodeQueue.length > 0) {
-    //   let currentNode = nodeQueue.dequeue();
-    //   let listChildNodes = childrenDepartments.filter(x => x.parentCode == currentNode.code);
-
-    //   console.log("listChildNode = ", listChildNodes);
-
-    //   //Nếu có danh sách child nodes
-    //   if (listChildNodes != null && listChildNodes.length > 0) {
-    //     //Gán danh sách node con vào node cha
-
-    //     for (let index = 0; index < listChildNodes.length; index++) {
-    //       const node = listChildNodes[index];
-    //       var mappedChildNode = this.mapNodeToAutoMapper(node);
-    //       currentNode.childDepartments.push(mappedChildNode);
-    //       nodeQueue.enqueue(mappedChildNode);
-    //     }
-
-    //     console.log("Current node after pushing children: ", currentNode);
-    //   }
-    // }
-
-    // return mappedNode;
+    return this.constructDepartmentTree(rootNode, relevantDepartments);
   }
 
 

@@ -1,0 +1,52 @@
+.demo{
+  margin-left: 10px;
+}
+
+
+.nice-numeric {
+  display: flex;
+  max-width: 300px;
+  margin-top: 10px;
+  /* border: 0.5px solid; */
+  border-color: rgb(160,160,255);
+  border-radius: 2px;
+}
+.nice-numeric__btn {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  
+}
+.nice-numeric__value {
+  flex: 2;
+  size: 20px;
+  font-size: 30px;
+  padding-left: 20px;
+  outline: none;
+}
+input{
+  height: 50px;
+}
+
+.nice-numeric--right-side-by-side {
+  outline: none;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+} 
+.right-side-by-side__value {
+  flex: 3;
+  outline: none;
+}
+.right-side-by-side__column {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  flex: 1;
+}
+
+button {
+  outline: none;
+}

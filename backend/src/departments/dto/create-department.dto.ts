@@ -6,7 +6,6 @@ export class CreateDepartmentDto {
     @IsNotEmpty({message: "Code must not empty"})
     readonly code: string;
     
-    
     @IsOptional()
     @IsNotEmpty()
     readonly parentCode: string;

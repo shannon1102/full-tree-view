@@ -76,9 +76,6 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
   }
 
   async findNestedAll(): Promise<DepartmentResponseDto[]> {
-    // return `This action returns all departments`;
-    // return this.departmentModel.find().exec();
-    // var departments = await this.departmentModel.find().exec();
     var employees = await this.employeeRepository.find();
     console.log("Employees = ", employees);
 

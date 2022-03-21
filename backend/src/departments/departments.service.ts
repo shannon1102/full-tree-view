@@ -3,36 +3,45 @@ import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { Model, Mongoose } from 'mongoose';
-import { DeparmentDocument, Department } from './schemas/department.schema';
+import { DepartmentDocument, Department } from './schemas/department.schema';
 import { Queue } from 'queue-typescript';
 import { DepartmentResponseDto } from './dto/department.dto';
 import * as mongoose from 'mongoose'
+import { BaseRepository } from 'src/repository/base.repository';
+import { DepartmentRepository } from './repositories/departments.repository';
+import { BaseService } from 'src/services/base.service';
+import { EmployeeRepository } from 'src/employee/repositories/employee.repository';
 @Injectable()
-export class DepartmentsService {
+export class DepartmentsService extends BaseService<Department, DepartmentDocument> {
+  // private readonly departmentRepository: DepartmentRepository;
   constructor(
-    @InjectModel(Department.name) private readonly departmentModel: Model<DeparmentDocument>,
+    private readonly departmentRepository: DepartmentRepository,
+    private readonly employeeRepository: EmployeeRepository,
+    // @InjectModel(Department.name) private readonly departmentModel: Model<DeparmentDocument>,
     @InjectConnection() private readonly connection: mongoose.Connection
-  ) { }
+  ) {
+    // this.departmentRepository = _departmentRepository;
+    super(departmentRepository);
+  }
 
   // async createMany(departments: Department[]) {
   //   this.departmentModel.
   // }
 
-  async create(createDepartmentDto: CreateDepartmentDto): Promise<Department> {
-    console.log("before create session");
-    
+  async create(createDepartmentDto: CreateDepartmentDto): Promise<DepartmentDocument> {
+    // console.log("before create session");
     var session = await this.connection.startSession();
-    
+
     //gán lại rootParentCode = null đề phòng front-end truyền sai dữ liệu
     createDepartmentDto.rootParentCode = null;
 
     //#region Validate logic 
     //Nếu có giá trị parentCode thì 
     if (createDepartmentDto.parentCode) {
-      console.log("before findOne()");
-      
-      var parentDepartment = await this.departmentModel.findOne({ code: createDepartmentDto.parentCode }).exec();
-      console.log("after findOne()");
+      // console.log("before findOne()");
+
+      var parentDepartment = await this.departmentRepository.findOne({ code: createDepartmentDto.parentCode });
+      // console.log("after findOne()");
 
       if (parentDepartment == null) {
         throw new HttpException({
@@ -48,7 +57,8 @@ export class DepartmentsService {
 
     try {
       await session.startTransaction()
-      const createdDepartment = await this.departmentModel.create([createDepartmentDto], { session: session });
+      const createdDepartment = await this.departmentRepository.create(createDepartmentDto);
+      // const createdDepartment = await this.departmentModel.create([createDepartmentDto], { session: session });
       await session.commitTransaction();
       return createdDepartment[0];
     } catch (error) {
@@ -65,10 +75,14 @@ export class DepartmentsService {
     }
   }
 
-  async findAll(): Promise<DepartmentResponseDto[]> {
+  async findNestedAll(): Promise<DepartmentResponseDto[]> {
     // return `This action returns all departments`;
     // return this.departmentModel.find().exec();
-    var departments = await this.departmentModel.find().exec();
+    // var departments = await this.departmentModel.find().exec();
+    var employees = await this.employeeRepository.find();
+    console.log("Employees = ", employees);
+
+    var departments = await this.departmentRepository.find();
     var rootDepartments = departments.filter(x => x.parentCode == null);
 
     var result = new Array<DepartmentResponseDto>();
@@ -77,14 +91,13 @@ export class DepartmentsService {
       result.push(this.constructDepartmentTree(rd, departments.filter(x => x.rootParentCode == rd.code)));
     }
 
-
     return result;
   }
 
   async findOne(id: string): Promise<DepartmentResponseDto> {
     console.log("department.service: findOne(), id = ", id);
 
-    let relevantDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: id }, { code: id }] }).exec();
+    let relevantDepartments = await this.departmentRepository.find({ $or: [{ rootParentCode: id }, { code: id }] });
     let rootNode = relevantDepartments.find(x => x.code == id);
     // let childrenDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: rootNode.code }, { code: id }] }).exec();
 
@@ -112,7 +125,7 @@ export class DepartmentsService {
    * @param relevantDepartments Các department mà có liên quan đến department này
    * @returns Department gốc sau khi đã append children của nó
    */
-  private constructDepartmentTree(rootDepartment: DeparmentDocument, relevantDepartments: DeparmentDocument[]): DepartmentResponseDto {
+  private constructDepartmentTree(rootDepartment: DepartmentDocument, relevantDepartments: DepartmentDocument[]): DepartmentResponseDto {
     // return null;
     if (rootDepartment == null) {
       return null
@@ -120,7 +133,7 @@ export class DepartmentsService {
 
     //Chuyển từ node lấy từ db sang node dto
     var mappedNode = this.mapNodeToAutoMapper(rootDepartment);
-    console.log("mappedNode = ", mappedNode);
+    // console.log("mappedNode = ", mappedNode);
 
     //Tạo queue lưu lại các node chưa được lấy child nodes
     let nodeQueue = new Queue<DepartmentResponseDto>(mappedNode);
@@ -129,7 +142,7 @@ export class DepartmentsService {
       let currentNode = nodeQueue.dequeue();
       let listChildNodes = relevantDepartments.filter(x => x.parentCode == currentNode.code);
 
-      console.log("listChildNode = ", listChildNodes);
+      // console.log("listChildNode = ", listChildNodes);
 
       //Nếu có danh sách child nodes
       if (listChildNodes != null && listChildNodes.length > 0) {
@@ -142,7 +155,7 @@ export class DepartmentsService {
           nodeQueue.enqueue(mappedChildNode);
         }
 
-        console.log("Current node after pushing children: ", currentNode);
+        // console.log("Current node after pushing children: ", currentNode);
       }
     }
 

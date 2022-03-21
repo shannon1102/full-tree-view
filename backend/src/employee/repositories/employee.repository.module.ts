@@ -1,17 +1,19 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import {  SchemaBase } from "src/departments/repository/repositoryBase";
+import {  BaseRepository } from "src/repository/base.repository";
+import { EmployeeRepository } from "src/employee/repositories/employee.repository";
 import { Employee, EmployeeSchema } from "src/employee/schemas/employee.schema";
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Employee.name, schema: EmployeeSchema }])
+        // new RepositoryBase<Employee>()
     ],
     providers: [
-        SchemaBase
+        EmployeeRepository
     ],
     exports: [
-        SchemaBase
+        EmployeeRepository
     ]
 })
-export class SchemaBaseModule {}
+export class EmployeeRepositoryModule {}

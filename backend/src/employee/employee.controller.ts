@@ -3,7 +3,7 @@ import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { Employee } from './schemas/employee.schema';
-import { SchemaBase } from 'src/departments/repository/repositoryBase';
+import { BaseRepository } from 'src/repository/base.repository';
 
 @Controller('employee')
 export class EmployeeController {
@@ -13,6 +13,7 @@ export class EmployeeController {
 
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
+    console.log("EmployeeController create() - dto: ", createEmployeeDto);
     return this.employeeService.create(createEmployeeDto);
   }
 

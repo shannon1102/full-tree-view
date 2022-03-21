@@ -3,24 +3,18 @@ import { EmployeeService } from './employee.service';
 import { EmployeeController } from './employee.controller';
 import { Employee, EmployeeSchema } from './schemas/employee.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SchemaBase } from 'src/departments/repository/repositoryBase';
-import { SchemaBaseModule } from 'src/repository/SchemaBase.module';
+import { BaseRepository } from 'src/repository/base.repository';
+import { EmployeeRepositoryModule } from 'src/employee/repositories/employee.repository.module';
+import { EmployeeRepository } from './repositories/employee.repository';
 console.log("Employee module first");
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Employee.name, schema: EmployeeSchema }]),
-    SchemaBaseModule
+    EmployeeRepositoryModule
   ],
   controllers: [EmployeeController],
   providers: [EmployeeService]
 })
-// @Module({
-//   imports: [
-//     MongooseModule.forFeature([{ name: Employee.name, schema: EmployeeSchema }])
-//   ],
-//   controllers: [SchemaBase],
-//   providers: []
-// })
 export class EmployeeModule { }
 
 console.log("Employee module second");

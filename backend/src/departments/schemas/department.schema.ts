@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { SchemaBase } from 'src/repository/schema.base';
 
 
-export type DeparmentDocument = Department & Document;
+export type DepartmentDocument = Department & Document;
 
 @Schema()
-export class Department {
+export class Department extends SchemaBase {
     @Prop()
     name: string;
 

@@ -1,27 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SchemaBase } from 'src/departments/repository/repositoryBase';
+import { BaseRepository } from 'src/repository/base.repository';
+import { BaseService } from 'src/services/base.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { EmployeeRepository } from './repositories/employee.repository';
 import { Employee, EmployeeDocument } from './schemas/employee.schema';
 
 @Injectable()
-export class EmployeeService {
+export class EmployeeService extends BaseService<Employee, EmployeeDocument> {
   constructor(
-    private readonly schemaBase: SchemaBase) {
-      // schemaBase = new SchemaBase();
-
-  }
-  create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
-    return this.schemaBase.employeeModel.create(createEmployeeDto);
+    private readonly employeeRepository: EmployeeRepository) {
+    // schemaBase = new SchemaBase();
+    super(employeeRepository);
+    // this.helloHuy();
   }
 
-  findAll(): Promise<Employee[]> {
-    console.log("Đã sử dụng được schemaBase: ", this.schemaBase.getClassName());
+  // create(createEmployeeDto: CreateEmployeeDto): Promise<Employee> {
+  //   return this.employeeRepository.create(createEmployeeDto);
+  // }
 
-    return this.schemaBase.employeeModel.find().exec();
-  }
+  // findAll(): Promise<Employee[]> {
+  //   // this.helloHuy();
+  //   console.log("Đã sử dụng được schemaBase: ", this.employeeRepository.getClassName());
+  //   // return null;
+  //   // return this.repository.find().exec();
+  //   return this.employeeRepository.find();
+  // }
 
   findOne(id: number) {
     return `This action returns a #${id} employee`;

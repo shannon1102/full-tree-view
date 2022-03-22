@@ -1,7 +1,7 @@
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
-import { Department } from 'src/repositories/department/schemas/department.schema';
+import { Department } from '../../repositories/department/schemas/department.schema';
 import { DepartmentsService } from './departments.service';
 
 const mockDepartment = {

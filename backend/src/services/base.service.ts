@@ -2,18 +2,16 @@ import { BaseRepository } from "src/repositories/base.repository"
 import { Document } from 'mongoose';
 import { SchemaBase } from "src/repositories/schema.base";
 
-export class BaseService<S extends SchemaBase, SD extends Document & SchemaBase> {
-    constructor(private readonly baseRepository: BaseRepository<S, SD>) {
-
+export class BaseService<TSchema extends SchemaBase, TSchemaDocument extends Document & SchemaBase> {
+    constructor(private readonly baseRepository: BaseRepository<TSchema, TSchemaDocument>) {
     }
 
-    create(createObj: S): Promise<SD> {
+    create(createObj: TSchema): Promise<TSchemaDocument> {
         console.log("BaseService - create()");
-
         return this.baseRepository.create(createObj);
     }
 
-    findAll(): Promise<SD[]> {
+    findAll(): Promise<TSchemaDocument[]> {
         console.log("BaseService - findAll()");
         return this.baseRepository.find();
     }
@@ -23,12 +21,7 @@ export class BaseService<S extends SchemaBase, SD extends Document & SchemaBase>
     remove(id: string) {
         return this.baseRepository.remove(id);
     }
-
-    update(id: string, updateEmployeeDto: S) {
+    update(id: string, updateEmployeeDto: TSchema) {
         return this.baseRepository.update(id, updateEmployeeDto);
     }
-    // helloHuy() {
-    //     console.log('Vao hello Huy o base service roi nhe');
-    //     console.log("Repo GetClassName = ", this.baseRepository.getClassName());
-    // }
 }

@@ -1,10 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Model, Mongoose } from 'mongoose';
 import { Queue } from 'queue-typescript';
 import * as mongoose from 'mongoose'
-import { BaseRepository } from 'src/repositories/base.repository';
-import { BaseService } from 'src/services/base.service';
+import { BaseService } from '../../services/base.service';
 import { EmployeeRepository } from 'src/repositories/employee/employee.repository';
 import { DepartmentRepository } from 'src/repositories/department/departments.repository';
 import { CreateDepartmentDto } from 'src/controllers/departments/dto/create-department.dto';
@@ -22,7 +20,7 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<DepartmentDocument> {
     // console.log("before create session");
-    var session = await this.connection.startSession();
+    // var session = await this.connection.startSession();
     createDepartmentDto.rootParentCode = null;
 
     if (createDepartmentDto.parentCode) {
@@ -77,15 +75,15 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     console.log("department.service: findOne(), id = ", id);
 
     let relevantDepartments = await this.departmentRepository.find({ $or: [{ rootParentCode: id }, { code: id }] });
-    let rootNode = relevantDepartments.find(x => x.code == id);
+    let rootDepartment = relevantDepartments.find(x => x.code == id);
 
-    console.log("rootNode = ", rootNode);
+    console.log("rootNode = ", rootDepartment);
 
-    if (rootNode == null) {
-      return null
+    if (rootDepartment == null) {
+      return null;
     }
 
-    return this.constructDepartmentTree(rootNode, relevantDepartments);
+    return this.constructDepartmentTree(rootDepartment, relevantDepartments);
   }
 
   private constructDepartmentTree(rootDepartment: DepartmentDocument, relevantDepartments: DepartmentDocument[]): DepartmentResponseDto {
@@ -93,28 +91,21 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
       return null
     }
 
-    //Chuyển từ node lấy từ db sang node dto
     var mappedNode = this.mapToResponseDto(rootDepartment);
 
-    //Tạo queue lưu lại các node chưa được lấy child nodes
     let nodeQueue = new Queue<DepartmentResponseDto>(mappedNode);
 
     while (nodeQueue.length > 0) {
       let currentNode = nodeQueue.dequeue();
       let children = relevantDepartments.filter(x => x.parentCode == currentNode.code);
 
-      //Nếu có danh sách child nodes
       if (children != null && children.length > 0) {
-        //Gán danh sách node con vào node cha
-
         for (let index = 0; index < children.length; index++) {
           const node = children[index];
           var mappedChildNode = this.mapToResponseDto(node);
           currentNode.childDepartments.push(mappedChildNode);
           nodeQueue.enqueue(mappedChildNode);
         }
-
-        // console.log("Current node after pushing children: ", currentNode);
       }
     }
 

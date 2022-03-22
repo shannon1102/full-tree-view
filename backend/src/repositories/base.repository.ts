@@ -1,47 +1,27 @@
 // CRUD
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel, MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Model, ObjectId } from 'mongoose';
+import { Document, Model } from 'mongoose';
 import { SchemaBase } from 'src/repositories/schema.base';
-const mongoose = require("mongoose")
 @Injectable()
-export class BaseRepository<T extends SchemaBase, TD extends Document & SchemaBase> {
-    private readonly baseModel: Model<TD>;
+export class BaseRepository<TSchema extends SchemaBase, TSchemaDocument extends Document & SchemaBase> {
+    private readonly baseModel: Model<TSchemaDocument>;
 
-    constructor(_baseModel: Model<TD>) {
+    constructor(_baseModel: Model<TSchemaDocument>) {
         this.baseModel = _baseModel;
     }
-    // constructor(c: new () => B) {
-    //     // constructor(@InjectModel(B.name) readonly employeeModel: Model<EmployeeDocument>) {
-    //     // this.createInstance(B).constructor.name;
-    //     console.log("B name at RepositoryBase: ", c.name);
 
-    //     this.baseModel = mongoose.model(c.name, EmployeeSchema);
-    //     console.log("baseModel = ", this.baseModel);
-    // }
-
-    createInstance<B>(c: new () => B): B {
-        return new c();
-    }
-
-    create(objectDto: T): Promise<TD> {
-        console.log("Object create in base repo: ", objectDto);
+    create(objectDto: TSchema): Promise<TSchemaDocument> {
+        console.log("BaseRepository create(): ", objectDto);
         objectDto.createdTime = new Date();
         return this.baseModel.create(objectDto);
     }
 
-    async find(query?: any): Promise<TD[]> {
-        console.log("đã vào find() ở repo");
-
+    async find(query?: any): Promise<TSchemaDocument[]> {
         return this.baseModel.find(query).exec();
     }
 
-    async findOne(id: any): Promise<TD> {
-        console.log("đã vào find() ở repo");
-
+    async findOne(id: any): Promise<TSchemaDocument> {
         return this.baseModel.findOne({ _id: id }).exec();
-        // var result = this.baseModel.findOne(query).exec();
-        // return result ? result[0] : null;
     }
 
     async remove(id: string) {
@@ -51,7 +31,7 @@ export class BaseRepository<T extends SchemaBase, TD extends Document & SchemaBa
             .exec();
         return deletedEntity;
     }
-    async update(id: any, dto: T) {
+    async update(id: any, dto: TSchema) {
         // const post = await this.baseModel.findByIdAndUpdate({ _id: id }, dto, { new: true });
         const existedDoc = await this.baseModel.findOne({ _id: id }).exec();
         dto.createdTime = existedDoc.createdTime;

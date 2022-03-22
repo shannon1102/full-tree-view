@@ -17,4 +17,4 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AppModule { }
 
-console.log("Connection = ", process.env.DATABASE_CONNECTION);
+// console.log("Connection = ", process.env.DATABASE_CONNECTION);

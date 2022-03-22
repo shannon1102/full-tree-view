@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { EmployeeService } from './employee.service';
 import { EmployeeController } from './employee.controller';
-import { Employee, EmployeeSchema } from './schemas/employee.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { BaseRepository } from 'src/repository/base.repository';
-import { EmployeeRepositoryModule } from 'src/employee/repositories/employee.repository.module';
-import { EmployeeRepository } from './repositories/employee.repository';
+import { BaseRepository } from 'src/repositories/base.repository';
+import { EmployeeRepositoryModule } from 'src/repositories/employee/employee.repository.module';
+import { Employee, EmployeeSchema } from 'src/repositories/employee/schemas/employee.schema';
+import { EmployeeService } from 'src/services/employee/employee.service';
 console.log("Employee module first");
 @Module({
   imports: [

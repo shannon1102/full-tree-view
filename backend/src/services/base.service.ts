@@ -1,6 +1,6 @@
-import { BaseRepository } from "src/repository/base.repository"
+import { BaseRepository } from "src/repositories/base.repository"
 import { Document } from 'mongoose';
-import { SchemaBase } from "src/repository/schema.base";
+import { SchemaBase } from "src/repositories/schema.base";
 
 export class BaseService<S extends SchemaBase, SD extends Document & SchemaBase> {
     constructor(private readonly baseRepository: BaseRepository<S, SD>) {

@@ -2,9 +2,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel, MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Model, ObjectId } from 'mongoose';
-import { CreateEmployeeDto } from 'src/employee/dto/create-employee.dto';
-import { Employee, EmployeeDocument, EmployeeSchema } from 'src/employee/schemas/employee.schema';
-import { SchemaBase } from 'src/repository/schema.base';
+import { SchemaBase } from 'src/repositories/schema.base';
 const mongoose = require("mongoose")
 @Injectable()
 export class BaseRepository<T extends SchemaBase, TD extends Document & SchemaBase> {
@@ -65,14 +63,4 @@ export class BaseRepository<T extends SchemaBase, TD extends Document & SchemaBa
         }
         return post;
     }
-
-    getClassName(): string {
-        // var ins = new B();
-        var ins = new Employee();
-        return "getClassName(): " + ins.constructor.name;
-    }
-
-    // getGenericTypeClassName(): string {
-    //     this.createInstance<B>(B);
-    // }
 }

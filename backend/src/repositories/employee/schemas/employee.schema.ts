@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { SchemaBase } from "src/repository/schema.base";
+import { SchemaBase } from "src/repositories/schema.base";
 import { Document } from 'mongoose';
 
 export type EmployeeDocument = Employee & Document;

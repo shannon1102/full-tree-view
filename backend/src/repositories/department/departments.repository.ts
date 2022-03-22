@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { BaseRepository } from "src/repository/base.repository";
-import { DepartmentDocument, Department } from "../schemas/department.schema";
+import { BaseRepository } from "src/repositories/base.repository";
+import { Department, DepartmentDocument } from "./schemas/department.schema";
 
 @Injectable()
 export class DepartmentRepository extends BaseRepository<Department, DepartmentDocument> {

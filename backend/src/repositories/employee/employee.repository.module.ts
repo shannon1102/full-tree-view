@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import {  BaseRepository } from "src/repository/base.repository";
-import { EmployeeRepository } from "src/employee/repositories/employee.repository";
-import { Employee, EmployeeSchema } from "src/employee/schemas/employee.schema";
+import {  BaseRepository } from "src/repositories/base.repository";
+import { EmployeeRepository } from "src/repositories/employee/employee.repository";
+import { Employee, EmployeeSchema } from "./schemas/employee.schema";
 
 @Module({
     imports: [

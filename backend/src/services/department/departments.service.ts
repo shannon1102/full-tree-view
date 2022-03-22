@@ -1,48 +1,32 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { CreateDepartmentDto } from './dto/create-department.dto';
-import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { Model, Mongoose } from 'mongoose';
-import { DepartmentDocument, Department } from './schemas/department.schema';
 import { Queue } from 'queue-typescript';
-import { DepartmentResponseDto } from './dto/department.dto';
 import * as mongoose from 'mongoose'
-import { BaseRepository } from 'src/repository/base.repository';
-import { DepartmentRepository } from './repositories/departments.repository';
+import { BaseRepository } from 'src/repositories/base.repository';
 import { BaseService } from 'src/services/base.service';
-import { EmployeeRepository } from 'src/employee/repositories/employee.repository';
+import { EmployeeRepository } from 'src/repositories/employee/employee.repository';
+import { DepartmentRepository } from 'src/repositories/department/departments.repository';
+import { CreateDepartmentDto } from 'src/controllers/departments/dto/create-department.dto';
+import { Department, DepartmentDocument } from 'src/repositories/department/schemas/department.schema';
+import { DepartmentResponseDto } from 'src/controllers/departments/dto/department.dto';
 @Injectable()
 export class DepartmentsService extends BaseService<Department, DepartmentDocument> {
-  // private readonly departmentRepository: DepartmentRepository;
   constructor(
     private readonly departmentRepository: DepartmentRepository,
     private readonly employeeRepository: EmployeeRepository,
-    // @InjectModel(Department.name) private readonly departmentModel: Model<DeparmentDocument>,
     @InjectConnection() private readonly connection: mongoose.Connection
   ) {
-    // this.departmentRepository = _departmentRepository;
     super(departmentRepository);
   }
-
-  // async createMany(departments: Department[]) {
-  //   this.departmentModel.
-  // }
 
   async create(createDepartmentDto: CreateDepartmentDto): Promise<DepartmentDocument> {
     // console.log("before create session");
     var session = await this.connection.startSession();
-
-    //gán lại rootParentCode = null đề phòng front-end truyền sai dữ liệu
     createDepartmentDto.rootParentCode = null;
 
-    //#region Validate logic 
-    //Nếu có giá trị parentCode thì 
     if (createDepartmentDto.parentCode) {
-      // console.log("before findOne()");
-
       var parentDepartment = await this.departmentRepository.findOne({ code: createDepartmentDto.parentCode });
-      // console.log("after findOne()");
-
       if (parentDepartment == null) {
         throw new HttpException({
           status: HttpStatus.BAD_REQUEST,
@@ -52,27 +36,25 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
 
       createDepartmentDto.rootParentCode = parentDepartment.rootParentCode ?? parentDepartment.code;
     }
-    //#endregion
 
-
-    try {
-      await session.startTransaction()
-      const createdDepartment = await this.departmentRepository.create(createDepartmentDto);
-      // const createdDepartment = await this.departmentModel.create([createDepartmentDto], { session: session });
-      await session.commitTransaction();
-      return createdDepartment[0];
-    } catch (error) {
-      await session.abortTransaction();
-      // throw new Error(error);
-      console.error(error);
-      throw new HttpException({
-        status: HttpStatus.BAD_REQUEST,
-        error: error,
-      }, HttpStatus.BAD_REQUEST);
-    }
-    finally {
-      session.endSession()
-    }
+    const createdDepartment = await this.departmentRepository.create(createDepartmentDto);
+    return createdDepartment;
+    // try {
+    //   await session.startTransaction()
+    //   // const createdDepartment = await this.departmentModel.create([createDepartmentDto], { session: session });
+    //   await session.commitTransaction();
+    // } catch (error) {
+    //   await session.abortTransaction();
+    //   // throw new Error(error);
+    //   console.error(error);
+    //   throw new HttpException({
+    //     status: HttpStatus.BAD_REQUEST,
+    //     error: error,
+    //   }, HttpStatus.BAD_REQUEST);
+    // }
+    // finally {
+    //   session.endSession()
+    // }
   }
 
   async findNestedAll(): Promise<DepartmentResponseDto[]> {
@@ -96,11 +78,9 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
 
     let relevantDepartments = await this.departmentRepository.find({ $or: [{ rootParentCode: id }, { code: id }] });
     let rootNode = relevantDepartments.find(x => x.code == id);
-    // let childrenDepartments = await this.departmentModel.find({ $or: [{ rootParentCode: rootNode.code }, { code: id }] }).exec();
 
     console.log("rootNode = ", rootNode);
 
-    // return null;
     if (rootNode == null) {
       return null
     }
@@ -108,43 +88,28 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     return this.constructDepartmentTree(rootNode, relevantDepartments);
   }
 
-  // update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
-  //   return `This action updates a #${id} department`;
-  // }
-
-
-  /**
-   * Dựng lên department tree của department gốc
-   * @param rootDepartment Deparment gốc
-   * @param relevantDepartments Các department mà có liên quan đến department này
-   * @returns Department gốc sau khi đã append children của nó
-   */
   private constructDepartmentTree(rootDepartment: DepartmentDocument, relevantDepartments: DepartmentDocument[]): DepartmentResponseDto {
-    // return null;
     if (rootDepartment == null) {
       return null
     }
 
     //Chuyển từ node lấy từ db sang node dto
-    var mappedNode = this.mapNodeToAutoMapper(rootDepartment);
-    // console.log("mappedNode = ", mappedNode);
+    var mappedNode = this.mapToResponseDto(rootDepartment);
 
     //Tạo queue lưu lại các node chưa được lấy child nodes
     let nodeQueue = new Queue<DepartmentResponseDto>(mappedNode);
 
     while (nodeQueue.length > 0) {
       let currentNode = nodeQueue.dequeue();
-      let listChildNodes = relevantDepartments.filter(x => x.parentCode == currentNode.code);
-
-      // console.log("listChildNode = ", listChildNodes);
+      let children = relevantDepartments.filter(x => x.parentCode == currentNode.code);
 
       //Nếu có danh sách child nodes
-      if (listChildNodes != null && listChildNodes.length > 0) {
+      if (children != null && children.length > 0) {
         //Gán danh sách node con vào node cha
 
-        for (let index = 0; index < listChildNodes.length; index++) {
-          const node = listChildNodes[index];
-          var mappedChildNode = this.mapNodeToAutoMapper(node);
+        for (let index = 0; index < children.length; index++) {
+          const node = children[index];
+          var mappedChildNode = this.mapToResponseDto(node);
           currentNode.childDepartments.push(mappedChildNode);
           nodeQueue.enqueue(mappedChildNode);
         }
@@ -157,14 +122,14 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
   }
 
 
-  private mapNodeToAutoMapper(defaultNode: Department): DepartmentResponseDto {
-    var mappedNode = new DepartmentResponseDto();
-    mappedNode.name = defaultNode.name;
-    mappedNode.code = defaultNode.code;
-    mappedNode.parentCode = defaultNode.parentCode;
-    mappedNode.id = defaultNode["_id"];
-    mappedNode.childDepartments = new Array<DepartmentResponseDto>();
+  private mapToResponseDto(defaultObj: Department): DepartmentResponseDto {
+    var mappedObj = new DepartmentResponseDto();
+    mappedObj.name = defaultObj.name;
+    mappedObj.code = defaultObj.code;
+    mappedObj.parentCode = defaultObj.parentCode;
+    mappedObj.id = defaultObj["_id"];
+    mappedObj.childDepartments = new Array<DepartmentResponseDto>();
 
-    return mappedNode;
+    return mappedObj;
   }
 }

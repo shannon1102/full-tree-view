@@ -1,8 +1,8 @@
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
+import { Department } from 'src/repositories/department/schemas/department.schema';
 import { DepartmentsService } from './departments.service';
-import { Department } from './schemas/department.schema';
 
 const mockDepartment = {
   name: 'Department #1',
@@ -65,6 +65,8 @@ describe('DepartmentsService', () => {
       code: "7",
       parentCode: "1",
       rootParentCode: null,
+      modifiedTime: new Date(),
+      createdTime: new Date(),
     };
     const createResult = await service.create(mockDepartment);
     expect(createResult).toEqual(createResult);

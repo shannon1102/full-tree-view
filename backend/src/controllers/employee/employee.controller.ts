@@ -1,15 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { Employee } from './schemas/employee.schema';
-import { BaseRepository } from 'src/repository/base.repository';
+import { BaseRepository } from 'src/repositories/base.repository';
+import { EmployeeService } from 'src/services/employee/employee.service';
 
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService,
-
-  ) { }
+  ) {
+    console.log("EmployeeController - constructor()");
+  }
 
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
@@ -19,6 +19,8 @@ export class EmployeeController {
 
   @Get()
   findAll() {
+    console.log("EmployeeController - findAll() - process.env.DATABASE_CONNECTION: ", process.env.DATABASE_CONNECTION);
+
     return this.employeeService.findAll();
   }
 
@@ -35,7 +37,7 @@ export class EmployeeController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     console.log("Vao API delete roi");
-    
+
     return this.employeeService.remove(id);
   }
 }

@@ -23,16 +23,16 @@ export class DepartmentsController {
   findOne(@Param('id') id: string) {
     console.log('DepartmentController GetOne, id = ', id);
     // return new Promise((rs, rj) => {});
-    return this.departmentsService.findOne(id);
+    return this.departmentsService.getDetailStructure(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
-    return this.departmentsService.update(+id, updateDepartmentDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
+  //   return this.departmentsService.update(id, updateDepartmentDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.departmentsService.remove(+id);
+    return this.departmentsService.remove(id);
   }
 }

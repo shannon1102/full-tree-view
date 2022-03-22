@@ -1,8 +1,9 @@
-import { PartialType } from "@nestjs/mapped-types";
+import { OmitType, PartialType } from "@nestjs/mapped-types";
+import { Exclude } from "class-transformer";
 import { IsOptional, IsNotEmpty, Equals } from "class-validator";
 import { Department } from "../schemas/department.schema";
 
-export class CreateDepartmentDto extends PartialType(Department) {
+export class CreateDepartmentDto extends OmitType(Department, ['modifiedTime'] as const) {
     @IsNotEmpty({ message: "Name must not empty" })
     readonly name: string;
     @IsNotEmpty({ message: "Code must not empty" })
@@ -14,4 +15,6 @@ export class CreateDepartmentDto extends PartialType(Department) {
     
     rootParentCode: string;
     createdTime: Date;
+    // @Exclude()
+    // modifiedTime: Date;
 }

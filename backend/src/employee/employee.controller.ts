@@ -24,16 +24,18 @@ export class EmployeeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.employeeService.findOne(+id);
+    return this.employeeService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateEmployeeDto: UpdateEmployeeDto) {
-    return this.employeeService.update(+id, updateEmployeeDto);
+    return this.employeeService.update(id, updateEmployeeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.employeeService.remove(+id);
+    console.log("Vao API delete roi");
+    
+    return this.employeeService.remove(id);
   }
 }

@@ -29,7 +29,7 @@ describe('DepartmentsController', () => {
     it("Should return corrected department tree", async () => {
       expect(controller.findOne("2")).resolves.toEqual({})
 
-      expect(service.findOne).toHaveBeenCalled();
+      expect(service.getDetailStructure).toHaveBeenCalled();
     })
   })
 

@@ -91,7 +91,7 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     return result;
   }
 
-  async findOne(id: string): Promise<DepartmentResponseDto> {
+  async getDetailStructure(id: string): Promise<DepartmentResponseDto> {
     console.log("department.service: findOne(), id = ", id);
 
     let relevantDepartments = await this.departmentRepository.find({ $or: [{ rootParentCode: id }, { code: id }] });
@@ -108,13 +108,10 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     return this.constructDepartmentTree(rootNode, relevantDepartments);
   }
 
-  update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
-    return `This action updates a #${id} department`;
-  }
+  // update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
+  //   return `This action updates a #${id} department`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} department`;
-  }
 
   /**
    * Dựng lên department tree của department gốc

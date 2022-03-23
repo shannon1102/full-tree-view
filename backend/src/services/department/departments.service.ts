@@ -7,7 +7,7 @@ import { EmployeeRepository } from 'src/repositories/employee/employee.repositor
 import { DepartmentRepository } from 'src/repositories/department/departments.repository';
 import { CreateDepartmentDto } from 'src/controllers/departments/dto/create-department.dto';
 import { Department, DepartmentDocument } from 'src/repositories/department/schemas/department.schema';
-import { DepartmentResponseDto } from 'src/controllers/departments/dto/department.dto';
+import { DepartmentResponseDto as DepartmentResponseDTO } from 'src/controllers/departments/dto/department.dto';
 @Injectable()
 export class DepartmentsService extends BaseService<Department, DepartmentDocument> {
   constructor(
@@ -55,14 +55,14 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     // }
   }
 
-  async findNestedAll(): Promise<DepartmentResponseDto[]> {
-    var employees = await this.employeeRepository.find();
-    console.log("Employees = ", employees);
+  async getStructuredDepartments(): Promise<DepartmentResponseDTO[]> {
+    // var employees = await this.employeeRepository.find();
+    // console.log("Employees = ", employees);
 
     var departments = await this.departmentRepository.find();
     var rootDepartments = departments.filter(x => x.parentCode == null);
 
-    var result = new Array<DepartmentResponseDto>();
+    var result = new Array<DepartmentResponseDTO>();
     for (let index = 0; index < rootDepartments.length; index++) {
       const rd = rootDepartments[index];
       result.push(this.constructDepartmentTree(rd, departments.filter(x => x.rootParentCode == rd.code)));
@@ -71,7 +71,7 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     return result;
   }
 
-  async getDetailStructure(id: string): Promise<DepartmentResponseDto> {
+  async getDetailStructure(id: string): Promise<DepartmentResponseDTO> {
     console.log("department.service: findOne(), id = ", id);
 
     let relevantDepartments = await this.departmentRepository.find({ $or: [{ rootParentCode: id }, { code: id }] });
@@ -86,14 +86,14 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
     return this.constructDepartmentTree(rootDepartment, relevantDepartments);
   }
 
-  private constructDepartmentTree(rootDepartment: DepartmentDocument, relevantDepartments: DepartmentDocument[]): DepartmentResponseDto {
+  private constructDepartmentTree(rootDepartment: DepartmentDocument, relevantDepartments: DepartmentDocument[]): DepartmentResponseDTO {
     if (rootDepartment == null) {
       return null
     }
 
     var mappedNode = this.mapToResponseDto(rootDepartment);
 
-    let nodeQueue = new Queue<DepartmentResponseDto>(mappedNode);
+    let nodeQueue = new Queue<DepartmentResponseDTO>(mappedNode);
 
     while (nodeQueue.length > 0) {
       let currentNode = nodeQueue.dequeue();
@@ -113,13 +113,13 @@ export class DepartmentsService extends BaseService<Department, DepartmentDocume
   }
 
 
-  private mapToResponseDto(defaultObj: Department): DepartmentResponseDto {
-    var mappedObj = new DepartmentResponseDto();
+  private mapToResponseDto(defaultObj: Department): DepartmentResponseDTO {
+    var mappedObj = new DepartmentResponseDTO();
     mappedObj.name = defaultObj.name;
     mappedObj.code = defaultObj.code;
     mappedObj.parentCode = defaultObj.parentCode;
     mappedObj.id = defaultObj["_id"];
-    mappedObj.childDepartments = new Array<DepartmentResponseDto>();
+    mappedObj.childDepartments = new Array<DepartmentResponseDTO>();
 
     return mappedObj;
   }

@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors } from '@nestjs/common';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { BaseRepository } from 'src/repositories/base.repository';
 import { EmployeeService } from 'src/services/employee/employee.service';
+import { TransactionInterceptor } from 'src/common/transaction.interceptor';
 
 @Controller('employee')
+@UseInterceptors(TransactionInterceptor)
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService,
   ) {
@@ -15,11 +16,13 @@ export class EmployeeController {
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     console.log("EmployeeController create() - dto: ", createEmployeeDto);
     return this.employeeService.create(createEmployeeDto);
+
+
   }
 
   @Get()
   findAll() {
-    console.log("EmployeeController - findAll() - process.env.DATABASE_CONNECTION: ", process.env.DATABASE_CONNECTION);
+    // console.log("EmployeeController - findAll() - process.env.DATABASE_CONNECTION: ", process.env.DATABASE_CONNECTION);
 
     return this.employeeService.findAll();
   }

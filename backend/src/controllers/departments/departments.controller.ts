@@ -16,7 +16,7 @@ export class DepartmentsController {
   findAll() {
     console.log("DepartmentController GetAll()");
     
-    return this.departmentsService.findNestedAll();
+    return this.departmentsService.getStructuredDepartments();
   }
 
   @Get(':id')

@@ -5,15 +5,15 @@ import { BaseRepository } from 'src/repositories/base.repository';
 import { EmployeeRepositoryModule } from 'src/repositories/employee/employee.repository.module';
 import { Employee, EmployeeSchema } from 'src/repositories/employee/schemas/employee.schema';
 import { EmployeeService } from 'src/services/employee/employee.service';
-console.log("Employee module first");
+import { TransactionService } from 'src/common/transaction.service';
+import { DepartmentRepositoryModule } from 'src/repositories/department/departments.repository.module';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Employee.name, schema: EmployeeSchema }]),
-    EmployeeRepositoryModule
+    EmployeeRepositoryModule,
+    // DepartmentRepositoryModule
   ],
   controllers: [EmployeeController],
   providers: [EmployeeService]
 })
 export class EmployeeModule { }
-
-console.log("Employee module second");

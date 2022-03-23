@@ -5,13 +5,13 @@ import { Department } from "src/repositories/department/schemas/department.schem
 
 export class CreateDepartmentDto extends OmitType(Department, ['modifiedTime'] as const) {
     @IsNotEmpty({ message: "Name must not empty" })
-    readonly name: string;
+    name: string;
     @IsNotEmpty({ message: "Code must not empty" })
-    readonly code: string;
+    code: string;
 
     @IsOptional()
     @IsNotEmpty()
-    readonly parentCode: string;
+    parentCode: string;
     
     rootParentCode: string;
     createdTime: Date;

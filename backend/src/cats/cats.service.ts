@@ -24,7 +24,9 @@ export class CatsService {
       await session.startTransaction();
       // console.log("cats.service - create() - createCatDto: ", createCatDto);
 
-      const createdCat = await this.catModel.create([ createCatDto ], { session: session });
+      console.log("CatService - create() - session: ", session);
+      const createdCat = await this.catModel.create([createCatDto], { session: session });
+
       // const createdCatSecond = await this.catModel.create([{ createCatDto }], { session: session });
       await session.commitTransaction();
     } catch (error) {

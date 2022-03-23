@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { EmployeeRepository } from "src/repositories/employee/employee.repository";
+import { TransactionService } from "src/common/transaction.service";
 import { DepartmentRepository } from "./departments.repository";
 import { Department, DepartmentSchema } from "./schemas/department.schema";
 
@@ -10,10 +10,12 @@ import { Department, DepartmentSchema } from "./schemas/department.schema";
 
     ],
     providers: [
-        DepartmentRepository
+        DepartmentRepository,
+        TransactionService
     ],
     exports: [
+        TransactionService,
         DepartmentRepository
     ]
 })
-export class DepartmentRepositoryModule {}
+export class DepartmentRepositoryModule { }
